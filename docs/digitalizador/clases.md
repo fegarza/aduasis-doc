@@ -1,17 +1,15 @@
-# Diagrama de clases
+# Diagrama de clases 
 
 
+## Clases abstractas
 
 ```mermaid
  classDiagram
-        class Cliente{
-
-        }
-
+    direction RL
         class DigitalizadorBase{
             + str: nombre
             + str: query
-            + List[PeticionBase] : peticiones
+            + Stack[PeticionBase] : peticiones
             + int :total_peticiones
             + generar_peticiones()
             + bool: tiene_peticiones()
@@ -19,14 +17,50 @@
             + PeticionBase: crear_peticion(row: Dict)
             + guardar_resultado(peticion: PeticionBase)
         }
+     
 
-        class DigitalizadorLogistica{
-            + str: consulta_dig_nombre(peticion: PeticionLogistica)
-            + str: consulta_dig_ruta(peticion: PeticionLogistica)
-            + int: consulta_secuencial_maximo(peticion: PeticionLogistica)
-            + definir_dig_archivo(peticion: PeticionLogistica)
+        class PeticionBase{
+            + Consulta: consulta
         }
-        class PeticionLogistica{
+
+        class ConsultaBase{
+            + int: timeout
+            + RespuestaBase: respuesta
+            + consultar(): Respuesta
+            
+        }
+
+        class RespuestaBase{
+            
+        }
+      
+ 
+        DigitalizadorBase --> PeticionBase
+
+        PeticionBase "1" *-- "1" ConsultaBase
+
+        ConsultaBase "1" *-- "1" RespuestaBase
+
+```
+
+## Clases abstractas heredadas por tipo
+
+### Peticiones abstractas 
+```mermaid
+ classDiagram
+direction LR
+        class PeticionBase{
+            + Consulta: consulta
+        }
+        class PeticionDigArchivo{
+            + DigArchivo: dig_archivo
+
+            + str: consulta_dig_nombre()
+            + str: consulta_dig_ruta()
+            + int: consulta_secuencial_maximo()
+            + definir_dig_archivo()
+        }
+         class DigArchivo{
             + str: id_aplicacion
             + str: id_modulo
             + int: id_documento
@@ -34,39 +68,58 @@
             + str: extension_archivo
         }
 
-        class PeticionBase{
-            + Consulta: consulta
+        
+        PeticionBase <|-- PeticionDigArchivo
+        PeticionDigArchivo "1" *-- "1" DigArchivo
+
+       
+
+```
+
+### Consultas abstractas 
+```mermaid
+ classDiagram
+direction LR
+        class ConsultaBase{
+            + int: timeout
+            + RespuestaBase: respuesta
+            + consultar(): Respuesta
+            
         }
 
-        class DigitalizadorOperacion{
-            + str: consulta_nombre(peticion: PeticionOperacion)
-        }
-        class PeticionOperacion{
-            + str: ruta_digitalizacion
-            + str: nombre_archivo
-        } 
-        class ConsultaBase{
+        class ConsultaSOAP{
             + str: endpoint
             + UsernameToken: username_token
-            + int: timeout
-            + Respuesta: respuesta
-            + consultar(): Respuesta
             + get_soap_client()
         }
+ 
+ 
+        
 
-        class Respuesta{
+         
+        
+        
+       
+
+        ConsultaBase <|-- ConsultaSOAP
+
+```
+
+
+### Respuestas abstractas 
+```mermaid
+ classDiagram
+direction LR
+
+        class RespuestaBase{
+            
+        }
+        class RespuestaSOAP{
             + Map: json
             + str: xml
         }
-        
-        Cliente-->DigitalizadorBase
-        DigitalizadorBase <|-- DigitalizadorLogistica
-        DigitalizadorBase --> PeticionBase
-        PeticionBase <|-- PeticionLogistica
-        DigitalizadorBase <|-- DigitalizadorOperacion
-        PeticionBase <|-- PeticionOperacion
-        DigitalizadorOperacion --> PeticionOperacion
-        DigitalizadorLogistica --> PeticionLogistica
-        PeticionBase "1" *-- "1" ConsultaBase
-        ConsultaBase "1" *-- "1" Respuesta
+
+        RespuestaBase <|-- RespuestaSOAP
+
+
 ```
